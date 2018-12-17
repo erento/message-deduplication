@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`message deduplication if message can be processed should throw an error in case message ID or subscriber name is not provided 1`] = `"Message ID \\"null\\" and subscriber name \\"null\\" have to be provided."`;
+
+exports[`message deduplication if message can be processed should throw an error in case message ID or subscriber name is not provided 2`] = `"Message ID \\"undefined\\" and subscriber name \\"undefined\\" have to be provided."`;
+
+exports[`message deduplication if message can be processed should throw an error in case message ID or subscriber name is not provided 3`] = `"Message ID \\"\\" and subscriber name \\"\\" have to be provided."`;
+
+exports[`message deduplication if message can be processed should throw an error in case message ID or subscriber name is not provided 4`] = `"Message ID \\"NaN\\" and subscriber name \\"NaN\\" have to be provided."`;
+
+exports[`message deduplication if message can be processed should throw an error in case message ID or subscriber name is not provided 5`] = `"Message ID \\"\\" and subscriber name \\"a\\" have to be provided."`;
+
+exports[`message deduplication if message can be processed should throw an error in case message ID or subscriber name is not provided 6`] = `"Message ID \\"a\\" and subscriber name \\"\\" have to be provided."`;
+
+exports[`message deduplication set message should fail to set a message to delivered if message doesn't exist 1`] = `"Couldn't find a message."`;

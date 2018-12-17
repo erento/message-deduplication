@@ -1,0 +1,72 @@
+{
+  "name": "@erento/message-deduplication",
+  "version": "1.0.0",
+  "description": "Provided methods allow you to deduplicate messages and get as close to only once message delivery for Google Pub/Sub, long running jobs, etc.",
+  "main": "dist/public_api.js",
+  "types": "dist/public_api.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "tslint -c tslint.json --fix -e \"**/node_modules/**\" -p ./tsconfig.json",
+    "lint-staged": "lint-staged",
+    "prebuild": "rm -rf dist && npm run lint && npm run test-ci",
+    "test": "jest --watch",
+    "test-ci": "jest"
+  },
+  "keywords": [
+    "message",
+    "deduplication",
+    "queue",
+    "long running",
+    "job",
+    "only once delivery",
+    "pubsub"
+  ],
+  "author": "Erento GmbH <developers@erento.com> (https://www.erento.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erento/message-deduplication.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "moment": "2.23.0",
+    "redis": "2.8.0"
+  },
+  "devDependencies": {
+    "@types/jest": "23.3.10",
+    "@types/node": "10.12.15",
+    "@types/redis": "2.8.8",
+    "husky": "1.2.1",
+    "jest": "23.6.0",
+    "lint-staged": "8.1.0",
+    "ts-jest": "23.10.5",
+    "tslint": "5.11.0",
+    "tslint-eslint-rules": "5.4.0",
+    "typescript": "3.2.2"
+  },
+  "precommit": [
+    "lint-staged"
+  ],
+  "lint-staged": {
+    "src/**/*.ts": [
+      "npm run lint",
+      "git add"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "testPathIgnorePatterns": [
+      "/dist/",
+      "/node_modules/"
+    ],
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json",
+      "node"
+    ],
+    "verbose": true
+  }
+}
