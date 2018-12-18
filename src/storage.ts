@@ -7,17 +7,16 @@ const map: Map<string, DeliveryInfo> = new Map<string, DeliveryInfo>();
 function createStorage (storeInMemoryOnly: boolean): DeliveryStorage<DeliveryInfo> {
     if (storeInMemoryOnly) {
         return {
-            get: (key: string): Promise<DeliveryInfo | undefined> => new Promise((resolve: Function, reject: Function): void => {
+            get: (key: string): Promise<DeliveryInfo | undefined> => new Promise((resolve: Function): void => {
                 const value: DeliveryInfo | undefined = map.get(key);
 
-                return !value ? reject(`Value for ${key} not found.`) : resolve(value);
+                return resolve(value);
             }),
             set: (key: string, value: DeliveryInfo): Promise<void> => new Promise<void>((resolve: Function, reject: Function): void => {
                 try {
                     map.set(key, value);
                     return resolve();
-                } catch {
-                }
+                } catch {}
 
                 return reject(`Unknown error.`);
             }),

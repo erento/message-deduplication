@@ -11,32 +11,6 @@ spec:
   selector:
     app: redis
 ---
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: redis-data-gke
-spec:
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 2G
-  gcePersistentDisk:
-    pdName: redis-data-beta
-    fsType: ext4
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: redis-data-claim
-spec:
-  storageClassName: ""
-  volumeName: redis-data-gke
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2G
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -90,5 +64,5 @@ spec:
       volumes:
         - name: redis-volume
           persistentVolumeClaim:
-            claimName: redis-data-claim
+            claimName: redis-data
             readOnly: false
