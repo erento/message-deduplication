@@ -8,3 +8,4 @@ tslint.json
 *.test.d.ts
 *.test.ts
 *.test.js
+deploy/
