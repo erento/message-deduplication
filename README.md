@@ -59,11 +59,11 @@ The behaviour can be modified by following environment variables:
 
 - `MD_MAX_ACKNOWLEDGE_TIME` (default: 900)
 
-    A time in seconds. This time specifies, how long should script run until it allows the delivery again. Note, that it doesn't send the message again, but only marks to be processed again. Resending of the message should be done by the publisher, e.g.: Google Pub/Sub Publisher.
+    A time in seconds. This time specifies, how long the script should run until it allows another delivery attempt. Note, that it doesn't send the message again, but only marks to be processed again. Resending of the message should be done by the publisher, e.g.: Google Pub/Sub Publisher.
 
 - `MD_MAX_MESSAGE_DURATION` (default: 864000 = 10 days)
 
-    A time in seconds. This time specifies, what is the maximal lifetime of the message saved in the storage.
+    A time in seconds. This time specifies, what is the maximum lifetime of the message saved in the storage.
 
 - `MD_REDIS_HOSTNAME` (default: 127.0.0.1)
 

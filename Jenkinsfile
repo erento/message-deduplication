@@ -1,21 +1,21 @@
 buildImage = docker.image('node:11.3')
 
 node {
-    stage('checkout') {
+    stage("checkout") {
         checkout scm
     }
 
-    stage('Tests') {
+    stage("tests") {
         agent {
             docker {
-                image 'node:11.3'
+                image "node:11.3"
             }
         }
 
         buildImage.inside() {
-            sh 'npm i'
-            sh 'npm run lint'
-            sh 'npm run test-ci'
+            sh "npm i"
+            sh "npm run lint"
+            sh "npm run test-ci"
         }
     }
 }

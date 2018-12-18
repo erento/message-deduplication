@@ -2,13 +2,14 @@ import * as moment from 'moment';
 import {DeliveryInfo, DeliveryInfoState, DeliveryStorage} from './domain';
 import {getDeliveryStorage} from './storage';
 
+const DEFAULT_ACKNOWLEDGE_TIME: number = 900;
 const storage: DeliveryStorage<DeliveryInfo> = getDeliveryStorage(
     process.env.MD_IN_MEMORY_ONLY ? !!process.env.MD_IN_MEMORY_ONLY : true,
 );
 
 const MAX_ACKNOWLEDGE_TIME: { unit: moment.DurationInputArg2, value: moment.DurationInputArg1 } = {
     unit: 'seconds',
-    value: process.env.MD_MAX_ACKNOWLEDGE_TIME || 900,
+    value: process.env.MD_MAX_ACKNOWLEDGE_TIME || DEFAULT_ACKNOWLEDGE_TIME,
 };
 
 export async function setInProgress (messageId: string, subscriberName: string): Promise<void> {
@@ -35,7 +36,7 @@ export async function setAsDelivered (messageId: string, subscriberName: string)
     }
 
     await storage.set(messageDeliveryKey, {
-        state: DeliveryInfoState.InProgress,
+        state: DeliveryInfoState.Delivered,
         createdTime: moment().utc().toISOString(),
     });
 }

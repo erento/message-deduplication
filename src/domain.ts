@@ -10,6 +10,5 @@ export interface DeliveryInfo {
 
 export interface DeliveryStorage<T> {
     get (key: string): Promise<T | undefined>;
-
     set (key: string, value: T, duration?: number): Promise<void>;
 }

@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  ports:
+    - port: 6379
+      name: redis
+  selector:
+    app: redis
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: redis-data-gke
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 2G
+  gcePersistentDisk:
+    pdName: redis-data-beta
+    fsType: ext4
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: redis-data-claim
+spec:
+  storageClassName: ""
+  volumeName: redis-data-gke
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2G
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis # has to match .spec.template.metadata.labels
+  serviceName: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis # has to match .spec.selector.matchLabels
+    spec:
+      containers:
+        - name: redis
+          image: redis:5.0-alpine # think about using own docker with fix for #2 from https://redislabs.com/blog/5-tips-for-running-redis-over-aws/
+          imagePullPolicy: Always
+          args: [
+            "--requirepass", "$(REDIS_PASS)",
+            "--dir", "/data",
+            "--loglevel", "notice",
+            "--logfile", "",
+            "--appendonly", "yes",
+            "--appendfsync", "everysec",
+            "--save", "900", "1",
+            "--save", "300", "10",
+            "--save", "30", "1000",
+            "--replica-read-only", "yes"
+          ]
+          ports:
+            - containerPort: 6379
+              name: redis
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 250m
+              memory: 512Mi
+          env:
+            - name: REDIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: tf-redis
+                  key: redis-password
+          volumeMounts:
+            - name: redis-volume
+              mountPath: /data
+      volumes:
+        - name: redis-volume
+          persistentVolumeClaim:
+            claimName: redis-data-claim
+            readOnly: false

@@ -2,10 +2,10 @@ import * as redis from 'redis';
 import {DeliveryInfo, DeliveryStorage} from './domain';
 
 const DEFAULT_REDIS_PASSWORD: string = 'my#secret#passw0rd!';
+const map: Map<string, DeliveryInfo> = new Map<string, DeliveryInfo>();
 
 function createStorage (storeInMemoryOnly: boolean): DeliveryStorage<DeliveryInfo> {
     if (storeInMemoryOnly) {
-        const map: Map<string, DeliveryInfo> = new Map<string, DeliveryInfo>();
         return {
             get: (key: string): Promise<DeliveryInfo | undefined> => new Promise((resolve: Function, reject: Function): void => {
                 const value: DeliveryInfo | undefined = map.get(key);

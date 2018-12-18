@@ -35,15 +35,26 @@ describe('message deduplication', (): void => {
                 createdTime: expect.stringContaining(moment().utc().toISOString().substr(0, 17)),
             });
         });
+        test('should set a message to delivered', async (): Promise<void> => {
+            mockGetter.mockResolvedValue(<DeliveryInfo> {
+                state: DeliveryInfoState.InProgress,
+                createdTime: moment().utc().toISOString(),
+            });
+            await expect(setAsDelivered(messageId, subscriberName)).resolves.toBeUndefined();
+            expect(mockSetter).toHaveBeenCalledWith(expectedKey, <DeliveryInfo> {
+                state: DeliveryInfoState.Delivered,
+                createdTime: expect.stringContaining(moment().utc().toISOString().substr(0, 17)),
+            });
+        });
 
         test('should fail to set a message to delivered if message doesn\'t exist', async (): Promise<void> => {
-            mockGetter.mockReturnValue(undefined);
+            mockGetter.mockResolvedValue(undefined);
             await expect(setAsDelivered(messageId, subscriberName)).rejects.toThrowErrorMatchingSnapshot();
             expect(mockSetter).not.toHaveBeenCalled();
         });
 
         test('should fail to set a message to delivered if is not in progress', async (): Promise<void> => {
-            mockGetter.mockReturnValue(<DeliveryInfo> {
+            mockGetter.mockResolvedValue(<DeliveryInfo> {
                 state: DeliveryInfoState.Delivered,
                 createdTime: moment().toISOString(),
             });
@@ -67,13 +78,13 @@ describe('message deduplication', (): void => {
         });
 
         test('should return false if it is delivered', async (): Promise<void> => {
-            mockGetter.mockReturnValue(<DeliveryInfo> {state: DeliveryInfoState.Delivered, createdTime: 'some time'});
+            mockGetter.mockResolvedValue(<DeliveryInfo> {state: DeliveryInfoState.Delivered, createdTime: 'some time'});
             await expect(canStartProcessing(messageId, subscriberName)).resolves.toEqual(false);
             expect(mockGetter).toHaveBeenCalledWith(expectedKey);
         });
 
         test('should return false if it is in progress and not expired', async (): Promise<void> => {
-            mockGetter.mockReturnValue(<DeliveryInfo> {
+            mockGetter.mockResolvedValue(<DeliveryInfo> {
                 state: DeliveryInfoState.InProgress,
                 createdTime: moment().subtract(2, 'minutes').toISOString(),
             });
@@ -82,7 +93,7 @@ describe('message deduplication', (): void => {
         });
 
         test('should return true if it is in progress but expired', async (): Promise<void> => {
-            mockGetter.mockReturnValue(<DeliveryInfo> {
+            mockGetter.mockResolvedValue(<DeliveryInfo> {
                 state: DeliveryInfoState.InProgress,
                 createdTime: moment().utc().subtract(20, 'minutes').toISOString(),
             });
