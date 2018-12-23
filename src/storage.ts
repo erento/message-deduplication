@@ -2,11 +2,24 @@ import * as redis from 'redis';
 import {DeliveryInfo, DeliveryStorage} from './domain';
 
 const DEFAULT_REDIS_PASSWORD: string = 'my#secret#passw0rd!';
+const DEFAULT_MESSAGE_DURATION: number = 864000;
 const map: Map<string, DeliveryInfo> = new Map<string, DeliveryInfo>();
+
+declare var process: {
+    env: {
+        MD_IN_MEMORY_ONLY: boolean | 0 | 1 | '0' | '1',
+        MD_MAX_MESSAGE_DURATION: string | number,
+        MD_REDIS_HOSTNAME: string,
+        MD_REDIS_OPTIONS: string,
+        MD_REDIS_PASSWORD: string,
+        MD_REDIS_PORT: number | string,
+    },
+};
 
 function createStorage (storeInMemoryOnly: boolean): DeliveryStorage<DeliveryInfo> {
     if (storeInMemoryOnly) {
         return {
+            _type: 'in-memory',
             get: (key: string): Promise<DeliveryInfo | undefined> => new Promise((resolve: Function): void => {
                 const value: DeliveryInfo | undefined = map.get(key);
 
@@ -44,10 +57,13 @@ function createStorage (storeInMemoryOnly: boolean): DeliveryStorage<DeliveryInf
     }
 
     return {
+        _type: 'redis',
         get: (key: string): Promise<DeliveryInfo | undefined> => new Promise((resolve: Function, reject: Function): void => {
             redisClient.get(
                 key,
-                (error: Error | null, reply: string): void => error ? reject(error.message) : resolve(JSON.parse(reply)),
+                (error: Error | null, reply: string): void => {
+                    error ? reject(error.message) : resolve(JSON.parse(reply));
+                },
             );
         }),
         set: (key: string, value: DeliveryInfo, duration?: number): Promise<void> =>
@@ -56,13 +72,13 @@ function createStorage (storeInMemoryOnly: boolean): DeliveryStorage<DeliveryInf
                     key,
                     JSON.stringify(value),
                     'EX',
-                    duration || +(process.env.MD_MAX_MESSAGE_DURATION || 864000),
+                    duration || +(process.env.MD_MAX_MESSAGE_DURATION || DEFAULT_MESSAGE_DURATION),
                     (error: Error | null, reply: 'OK' | undefined): void => error ? reject(error.message) : resolve(reply),
                 );
             }),
     };
 }
 
-export function getDeliveryStorage (storeInMemoryOnly: boolean): DeliveryStorage<DeliveryInfo> {
-    return createStorage(storeInMemoryOnly);
+export function getDeliveryStorage (value: any = process.env.MD_IN_MEMORY_ONLY): DeliveryStorage<DeliveryInfo> {
+    return createStorage(!(value !== undefined ? +value === 0 : false));
 }

@@ -1,15 +1,21 @@
 import * as moment from 'moment';
-import {DeliveryInfo, DeliveryInfoState, DeliveryStorage} from './domain';
+import {CanDeliver, DeliveryInfo, DeliveryInfoState, DeliveryStorage} from './domain';
 import {getDeliveryStorage} from './storage';
 
+declare var process: {
+    env: {
+        MD_MAX_ACKNOWLEDGE_TIME: number | string,
+    },
+};
+
+export {CanDeliver};
+
 const DEFAULT_ACKNOWLEDGE_TIME: number = 900;
-const storage: DeliveryStorage<DeliveryInfo> = getDeliveryStorage(
-    process.env.MD_IN_MEMORY_ONLY ? !!process.env.MD_IN_MEMORY_ONLY : true,
-);
+const storage: DeliveryStorage<DeliveryInfo> = getDeliveryStorage();
 
 const MAX_ACKNOWLEDGE_TIME: { unit: moment.DurationInputArg2, value: moment.DurationInputArg1 } = {
     unit: 'seconds',
-    value: process.env.MD_MAX_ACKNOWLEDGE_TIME || DEFAULT_ACKNOWLEDGE_TIME,
+    value: process.env.MD_MAX_ACKNOWLEDGE_TIME ? process.env.MD_MAX_ACKNOWLEDGE_TIME : DEFAULT_ACKNOWLEDGE_TIME,
 };
 
 export async function setInProgress (messageId: string, subscriberName: string): Promise<void> {
@@ -41,7 +47,7 @@ export async function setAsDelivered (messageId: string, subscriberName: string)
     });
 }
 
-export async function canStartProcessing (messageId: string, subscriberName: string): Promise<boolean> {
+export async function canBeDelivered (messageId: string, subscriberName: string): Promise<CanDeliver> {
     if (!messageId || !subscriberName) {
         throw new Error(`Message ID "${messageId}" and subscriber name "${subscriberName}" have to be provided.`);
     }
@@ -49,20 +55,22 @@ export async function canStartProcessing (messageId: string, subscriberName: str
     const messageDeliveryKey: string = getMessageDeliveryKey(messageId, subscriberName);
 
     const deliveryInfo: DeliveryInfo | undefined = await storage.get(messageDeliveryKey);
-    if (deliveryInfo !== undefined) {
-        if (deliveryInfo.state === DeliveryInfoState.Delivered) {
-            return false;
-        }
+    if (!deliveryInfo) {
+        return CanDeliver.Yes;
+    }
 
-        const expiredTime: moment.Moment = moment().utc().subtract(MAX_ACKNOWLEDGE_TIME.value, MAX_ACKNOWLEDGE_TIME.unit);
-        if (deliveryInfo.state === DeliveryInfoState.InProgress) {
-            if (moment(deliveryInfo.createdTime).utc().isAfter(expiredTime)) {
-                return false;
-            }
+    if (deliveryInfo.state === DeliveryInfoState.Delivered) {
+        return CanDeliver.NoAlreadyDelivered;
+    }
+
+    const expiredTime: moment.Moment = moment().utc().subtract(MAX_ACKNOWLEDGE_TIME.value, MAX_ACKNOWLEDGE_TIME.unit);
+    if (deliveryInfo.state === DeliveryInfoState.InProgress) {
+        if (moment(deliveryInfo.createdTime).utc().isAfter(expiredTime)) {
+            return CanDeliver.NoInProgress;
         }
     }
 
-    return true;
+    return CanDeliver.Yes;
 }
 
 function getMessageDeliveryKey (messageId: string, subscriberName: string): string {

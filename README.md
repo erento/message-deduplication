@@ -29,22 +29,23 @@ In this case, message would be still marked as ready to be processed and not "In
 
 ## How to use it
 
-```js
-const deliveryManagement = require('@erento/message-deduplication');
+```typescript
+import {CanDeliver, canBeDelivered, setAsDelivered, setInProgress} from '@erento/message-deduplication';
 
 const subscriberName = 'my-subscriber-name';
 
 async function processMessage(message) {
-    try {
-        if (await deliveryManagement.canStartProcessing(message.id, subscriberName)) {
-            await deliveryManagement.setInProgress(message.id, subscriberName);
+    const messageDeliveryStatus: CanDeliver = await canBeDelivered(message.id, subscriberName);
+    if (messageDeliveryStatus === CanDeliver.Yes) {
+        await setInProgress(message.id, subscriberName);
 
-            // process a message (your application logic)
+        // process a message (your application logic)
 
-            await deliveryManagement.setAsDelivered(message.id, subscriberName);
-        }
-    } catch {
-        // log an error
+        await setAsDelivered(message.id, subscriberName);
+    } else if (messageDeliveryStatus === CanDeliver.NoAlreadyDelivered) {
+        // Message was already delivered.
+    } else if (messageDeliveryStatus === CanDeliver.NoInProgress) {
+        // NACK the message = message should be retried (consider to retry the message with some small delay)
     }
 }
 ```
