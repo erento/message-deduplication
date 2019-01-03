@@ -49,7 +49,6 @@ describe('Storage', (): void => {
         0,
         '0',
     ])('should get redis storage type based on env variables', (processMockedValue: any): void => {
-        console.log('-->processMockedValue', processMockedValue);
         expect(getDeliveryStorage(processMockedValue)).toEqual(expect.objectContaining(<DeliveryStorage<DeliveryInfo>> {
             _type: 'redis',
             get: expect.any(Function),
