@@ -82,6 +82,14 @@ The behaviour can be modified by following environment variables:
 
     The options provided to the redis client, if provided.
 
+## Kubernetes setup
+
+To make our life easier, there is our recommended setup for kubernetes, see more in [deploy/kube/redis.yml](deploy/kube/redis.yml).
+
+There are only few changes required:
+ - Change a name and key of the secret for `REDIS_PASS`.
+ - Make sure `redis-volume` is prepared.
+
 ## Stay in touch
 
 * [Erento's developers](mailto:developers@erento.com) 
