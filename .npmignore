@@ -9,3 +9,4 @@ tslint.json
 *.test.ts
 *.test.js
 deploy/
+redis-example.js
