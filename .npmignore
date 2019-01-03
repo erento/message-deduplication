@@ -1,0 +1,11 @@
+.idea
+Jenkinsfile
+*.tgz
+src/
+tsconfig.json
+tslint.json
+*.snap
+*.test.d.ts
+*.test.ts
+*.test.js
+deploy/
