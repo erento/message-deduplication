@@ -1,6 +1,6 @@
 {
   "name": "@erento/message-deduplication",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0",
   "description": "Provided methods allow you to deduplicate messages and get as close to only once message delivery for Google Pub/Sub, long running jobs, etc.",
   "main": "dist/public_api.js",
   "types": "dist/public_api.d.ts",
