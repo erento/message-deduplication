@@ -1,4 +1,4 @@
-buildImage = docker.image('node:11.3')
+buildImage = docker.image("node:11.15")
 
 node {
     stage("checkout") {
@@ -8,7 +8,7 @@ node {
     stage("tests") {
         agent {
             docker {
-                image "node:11.3"
+                image "node:11.15"
             }
         }
 

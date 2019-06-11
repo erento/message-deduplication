@@ -4,8 +4,8 @@ import {getDeliveryStorage} from './storage';
 
 declare var process: {
     env: {
-        MD_MAX_ACKNOWLEDGE_TIME: number | string,
-    },
+        MD_MAX_ACKNOWLEDGE_TIME: number | string;
+    };
 };
 
 export {CanDeliver};
@@ -13,7 +13,7 @@ export {CanDeliver};
 const DEFAULT_ACKNOWLEDGE_TIME: number = 900;
 const storage: DeliveryStorage<DeliveryInfo> = getDeliveryStorage();
 
-const MAX_ACKNOWLEDGE_TIME: { unit: moment.DurationInputArg2, value: moment.DurationInputArg1 } = {
+const MAX_ACKNOWLEDGE_TIME: { unit: moment.DurationInputArg2; value: moment.DurationInputArg1 } = {
     unit: 'seconds',
     value: process.env.MD_MAX_ACKNOWLEDGE_TIME ? process.env.MD_MAX_ACKNOWLEDGE_TIME : DEFAULT_ACKNOWLEDGE_TIME,
 };

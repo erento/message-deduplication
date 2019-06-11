@@ -7,13 +7,13 @@ const map: Map<string, DeliveryInfo> = new Map<string, DeliveryInfo>();
 
 declare var process: {
     env: {
-        MD_IN_MEMORY_ONLY: boolean | 0 | 1 | '0' | '1',
-        MD_MAX_MESSAGE_DURATION: string | number,
-        MD_REDIS_HOSTNAME: string,
-        MD_REDIS_OPTIONS: string,
-        MD_REDIS_PASSWORD: string,
-        MD_REDIS_PORT: number | string,
-    },
+        MD_IN_MEMORY_ONLY: boolean | 0 | 1 | '0' | '1';
+        MD_MAX_MESSAGE_DURATION: string | number;
+        MD_REDIS_HOSTNAME: string;
+        MD_REDIS_OPTIONS: string;
+        MD_REDIS_PASSWORD: string;
+        MD_REDIS_PORT: number | string;
+    };
 };
 
 function createStorage (storeInMemoryOnly: boolean): DeliveryStorage<DeliveryInfo> {
