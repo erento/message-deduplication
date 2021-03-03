@@ -32,7 +32,7 @@ podTemplate(label: "global") {
 
             stage("unit test") {
                 container(name: "node-image") {
-                    sh(script: "npm run test")
+                    sh(script: "npm run test-ci")
                 }
                 milestone(label: "unit tests complete")
             }
