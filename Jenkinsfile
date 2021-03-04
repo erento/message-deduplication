@@ -1,21 +1,41 @@
-buildImage = docker.image("node:11.15")
+projectBaseName = "message-deduplication"
+nodeImage = "node:11.15"
+shortLabel = projectBaseName.size() >= 10 ? projectBaseName.substring(0, 10) : projectBaseName
+buildLabel = "${shortLabel}-${UUID.randomUUID().toString()}"
 
-node {
-    stage("checkout") {
-        checkout scm
-    }
-
-    stage("tests") {
-        agent {
-            docker {
-                image "node:11.15"
+podTemplate(label: "global") {
+    podTemplate(
+        label: buildLabel,
+        containers: [
+            containerTemplate(name: "node-image", image: nodeImage, ttyEnabled: true, command: "cat"),
+        ],
+        nodeSelector: "type=worker",
+    ) {
+        node(buildLabel) {
+            stage("checkout") {
+                checkout scm
             }
-        }
 
-        buildImage.inside() {
-            sh "npm i"
-            sh "npm run lint"
-            sh "npm run test-ci"
+            stage("prepare dependencies") {
+                container(name: "node-image") {
+                    sh(script: "npm install")
+                }
+                milestone(label: "dependencies ready")
+            }
+
+            stage("lint") {
+                container(name: "node-image") {
+                    sh(script: "npm run lint")
+                }
+                milestone(label: "linting complete")
+            }
+
+            stage("unit test") {
+                container(name: "node-image") {
+                    sh(script: "npm run test-ci")
+                }
+                milestone(label: "unit tests complete")
+            }
         }
     }
 }
