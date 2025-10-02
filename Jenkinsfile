@@ -1,7 +1,7 @@
-projectBaseName = "message-deduplication"
-nodeImage = "node:11.15"
-shortLabel = projectBaseName.size() >= 10 ? projectBaseName.substring(0, 10) : projectBaseName
-buildLabel = "${shortLabel}-${UUID.randomUUID().toString()}"
+def projectBaseName = "message-deduplication"
+def nodeImage = "node:11.15"
+def shortLabel = projectBaseName.size() >= 10 ? projectBaseName.substring(0, 10) : projectBaseName
+def buildLabel = "${shortLabel}-${UUID.randomUUID().toString()}"
 
 podTemplate(label: "global") {
     podTemplate(
